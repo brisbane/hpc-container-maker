@@ -164,9 +164,11 @@ class gnu(bb_base, hpccm.templates.ConfigureMake, hpccm.templates.envvars,
         self.__commands = []       # Filled in below
         self.__compiler_debs = []  # Filled in below
         self.__compiler_rpms = []  # Filled in below
+        self.__compiler_zypper_rpms = []  # Filled in below
         self.__extra_repo_apt = [] # Filled in below
         self.__runtime_debs = ['libgomp1']
         self.__runtime_rpms = ['libgomp']
+        self.__runtime_zypper_rpms = ['libgomp1']
 
         # Output toolchain
         self.toolchain = toolchain()
@@ -314,8 +316,11 @@ class gnu(bb_base, hpccm.templates.ConfigureMake, hpccm.templates.envvars,
             elif hpccm.config.g_linux_distro == linux_distro.CENTOS:
                 self.__ospackages = ['bzip2', 'file', 'gcc', 'gcc-c++', 'git',
                                      'make', 'perl', 'tar', 'wget', 'xz']
+            elif hpccm.config.g_linux_distro == linux_distro.SUSE:
+                self.__ospackages = ['bzip2', 'file', 'gcc', 'gcc-c++', 'git',
+                                     'make', 'perl', 'tar', 'wget', 'xz']
             else: # pragma: no cover
-                raise RuntimeError('Unknown Linux distribution')
+                raise RuntimeError('Unknown Linux distribution in __distro')
 
         elif self.__version and not self.__source:
             # Setup the environment so that the alternate compiler version
@@ -331,7 +336,7 @@ class gnu(bb_base, hpccm.templates.ConfigureMake, hpccm.templates.envvars,
             elif hpccm.config.g_linux_distro == linux_distro.CENTOS:
                 self.environment_variables['PATH'] = '/opt/rh/devtoolset-{}/root/usr/bin:$PATH'.format(self.__version)
             else: # pragma: no cover
-                raise RuntimeError('Unknown Linux distribution')
+                raise RuntimeError('Unknown Linux distribution in __distro')
 
     def __instructions(self):
         """Fill in container instructions"""
@@ -344,6 +349,7 @@ class gnu(bb_base, hpccm.templates.ConfigureMake, hpccm.templates.envvars,
             self += packages(apt=self.__compiler_debs,
                              apt_ppas=self.__extra_repo_apt,
                              scl=bool(self.__version), # True / False
+                             zypper=self.__compiler_zypper_rpms,
                              yum=self.__compiler_rpms)
         if self.__commands:
             self += shell(commands=self.__commands)
@@ -355,18 +361,22 @@ class gnu(bb_base, hpccm.templates.ConfigureMake, hpccm.templates.envvars,
         if self.__cc:
             self.__compiler_debs.append('gcc')
             self.__compiler_rpms.append('gcc')
+            self.__compiler_zypper_rpms.append('gcc')
             self.toolchain.CC = 'gcc'
 
         if self.__cxx:
             self.__compiler_debs.append('g++')
             self.__compiler_rpms.append('gcc-c++')
+            self.__compiler_zypper_rpms.append('gcc-c++')
             self.toolchain.CXX = 'g++'
 
         if self.__fortran:
             self.__compiler_debs.append('gfortran')
             self.__runtime_debs.append('libgfortran3')
             self.__compiler_rpms.append('gcc-gfortran')
+            self.__compiler_zypper_rpms.append('gcc-fortran')
             self.__runtime_rpms.append('libgfortran')
+            self.__runtime_zypper_rpms.append('libgfortran4')
             self.toolchain.F77 = 'gfortran'
             self.toolchain.F90 = 'gfortran'
             self.toolchain.FC = 'gfortran'
@@ -416,6 +426,7 @@ class gnu(bb_base, hpccm.templates.ConfigureMake, hpccm.templates.envvars,
                 packages(apt=self.__runtime_debs,
                          apt_ppas=self.__extra_repo_apt,
                          scl=bool(self.__version), # True / False
+                         zypper=self.__runtime_zypper_rpms,
                          yum=self.__runtime_rpms))
 
         return '\n'.join(str(x) for x in instructions)

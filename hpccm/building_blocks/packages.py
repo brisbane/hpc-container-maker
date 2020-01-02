@@ -27,6 +27,7 @@ import hpccm.config
 from hpccm.building_blocks.apt_get import apt_get
 from hpccm.building_blocks.base import bb_base
 from hpccm.building_blocks.yum import yum
+from hpccm.building_blocks.zypper import zypper
 from hpccm.common import linux_distro
 
 class packages(bb_base):
@@ -140,6 +141,8 @@ class packages(bb_base):
         self.__yum_keys = kwargs.get('yum_keys', [])
         self.__yum_repositories = kwargs.get('yum_repositories', [])
 
+        self.__zypper = kwargs.get('zypper', [])
+
         # Fill in container instructions
         self.__instructions()
 
@@ -175,5 +178,22 @@ class packages(bb_base):
                         scl=self.__scl,
                         repositories=self.__yum_repositories,
                         yum4=self.__yum4)
+        elif hpccm.config.g_linux_distro == linux_distro.SUSE:
+            if self.__zypper:
+                 ospackages = self.__zypper
+            else:
+                 ospackages = self.__ospackages
+            
+            self += zypper(download=self.__download,
+                        extract=self.__extract,
+                        epel=self.__epel,
+                        keys=self.__yum_keys,
+                        ospackages=ospackages,
+                        powertools=self.__powertools,
+                        scl=self.__scl,
+                        repositories=self.__yum_repositories,
+                        yum4=self.__yum4)
+
+
         else:
             raise RuntimeError('Unknown Linux distribution')

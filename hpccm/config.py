@@ -142,6 +142,9 @@ def set_linux_distro(distro):
   elif distro == 'ubuntu18':
     this.g_linux_distro = linux_distro.UBUNTU
     this.g_linux_version = StrictVersion('18.04')
+  elif distro == 'suse':
+    this.g_linux_distro = linux_distro.SUSE
+    this.g_linux_version = StrictVersion('15.1')
   else:
     logging.warning('Unable to determine the Linux distribution, defaulting to Ubuntu')
     this.g_linux_distro = linux_distro.UBUNTU

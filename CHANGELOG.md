@@ -1,3 +1,6 @@
+# v19.13.0
+- Adds SUSE supoport 
+
 # v19.12.0
 
 - Adds generic builder (`generic_build`), PMI (`slurm_pmi`), and PMIx

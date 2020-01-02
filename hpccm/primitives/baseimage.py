@@ -55,6 +55,8 @@ class baseimage(object):
 
     _docker_env: Boolean specifying whether to load the Docker base
      image environment, i.e., source
+     bootstrap: Currently singualrity specific, bootstrap from somewhere other than docker hub 
+         eg docker-daemon to use a local image as bootstrap
      `/.singularity.d/env/10-docker*.sh` (Singularity specific).  The
      default value is True.
 
@@ -80,6 +82,7 @@ class baseimage(object):
         self.__as = kwargs.get('AS', '') # Deprecated
         self.__as = kwargs.get('_as', self.__as)
         self.image = kwargs.get('image', 'nvidia/cuda:9.0-devel-ubuntu16.04')
+        self.bootstrap = kwargs.get('bootstrap', 'docker')
         self.__distro = kwargs.get('_distro', '')
         self.__docker_env = kwargs.get('_docker_env', True) # Singularity specific
 
@@ -138,6 +141,9 @@ class baseimage(object):
             hpccm.config.set_linux_distro('ubuntu18')
         elif re.search(r'ubuntu', self.image):
             hpccm.config.set_linux_distro('ubuntu')
+        elif re.search(r'suse', self.image):
+            hpccm.config.set_linux_distro('suse')
+
         else:
             logging.warning('Unable to determine the Linux distribution, defaulting to Ubuntu')
             hpccm.config.set_linux_distro('ubuntu')
@@ -152,7 +158,7 @@ class baseimage(object):
 
             return image
         elif hpccm.config.g_ctype == container_type.SINGULARITY:
-            image = 'BootStrap: docker\nFrom: {}'.format(self.image)
+            image = 'BootStrap: {0}\nFrom: {1}'.format(self.bootstrap, self.image)
 
             if (self.__as and
                 hpccm.config.g_singularity_version >= StrictVersion('3.2')):

@@ -191,9 +191,37 @@ class mlnx_ofed(bb_base, hpccm.templates.rm, hpccm.templates.tar,
                         self.__oslabel = 'rhel7.2'
             if not self.__ospackages:
                 self.__ospackages = ['findutils', 'libnl3', 'numactl-libs',
-                                     'wget']
+                                     'wget', 'tar', 'gzip']
                 if hpccm.config.g_linux_version < StrictVersion('8.0'):
                     self.__ospackages.append('libnl')
+            if not self.__packages:
+                self.__packages = ['libibverbs', 'libibverbs-devel',
+                                   'libibverbs-utils',
+                                   'libibmad', 'libibmad-devel',
+                                   'libibumad', 'libibumad-devel',
+                                   'libmlx4', 'libmlx4-devel',
+                                   'libmlx5', 'libmlx5-devel',
+                                   'librdmacm-devel', 'librdmacm']
+
+            self.__label = 'MLNX_OFED_LINUX-{0}-{1}-{2}'.format(
+                self.__version, self.__oslabel, self.__arch_download)
+
+            self.__installer = 'rpm --install'
+            self.__extractor_template = 'sh -c "rpm2cpio {0} | cpio -idm"'
+
+            self.__pkglist = '.*(' + '|'.join(sorted(self.__packages)) + ')-[0-9].*{}.rpm'.format(self.__arch_pkg)
+        elif hpccm.config.g_linux_distro == linux_distro.SUSE:
+            if not self.__oslabel:
+                if hpccm.config.g_cpu_arch == cpu_arch.AARCH64:
+                    raise RuntimeError('SUPPORT for suse arm not available')
+                else:
+                    if hpccm.config.g_linux_version < StrictVersion('15.1'):
+                        raise RuntimeError('SUPPORT for suse <15.1 not available')
+                    else: #https://www.mellanox.com/downloads/ofed/MLNX_OFED-4.7-3.2.9.0/MLNX_OFED_LINUX-4.7-3.2.9.0-sles15sp1-x86_64.tgz
+                        self.__oslabel = 'sles15sp1'
+            if not self.__ospackages:
+                self.__ospackages = ['findutils', 'libnl3-200', 'numactl',
+                                     'wget', 'tar', 'gzip']
             if not self.__packages:
                 self.__packages = ['libibverbs', 'libibverbs-devel',
                                    'libibverbs-utils',

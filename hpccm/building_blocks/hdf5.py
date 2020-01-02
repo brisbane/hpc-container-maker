@@ -173,6 +173,13 @@ class hdf5(bb_base, hpccm.templates.ConfigureMake, hpccm.templates.envvars,
                 if self.__check:
                     self.__ospackages.append('diffutils')
             self.__runtime_ospackages = ['zlib']
+        elif hpccm.config.g_linux_distro == linux_distro.SUSE:
+            if not self.__ospackages:
+                self.__ospackages = ['bzip2', 'file', 'make', 'wget',
+                                     'zlib-devel']
+                if self.__check:
+                    self.__ospackages.append('diffutils')
+            self.__runtime_ospackages = ['zlib']
         else: # pragma: no cover
             raise RuntimeError('Unknown Linux distribution')
 

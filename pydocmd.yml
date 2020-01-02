@@ -49,6 +49,7 @@ generate:
   - hpccm.building_blocks.ucx+
   - hpccm.building_blocks.xpmem+
   - hpccm.building_blocks.yum+
+  - hpccm.building_blocks.zypper+
 - primitives.md:
   - hpccm.primitives.baseimage
   - hpccm.primitives.blob

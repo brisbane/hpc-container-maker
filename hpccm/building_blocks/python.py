@@ -71,22 +71,27 @@ class python(bb_base):
 
         self.__debs = [] # Filled in below
         self.__rpms = [] # Filled in below
+        self.__zypper = [] # Filled in below
 
         if self.__python2:
             self.__debs.append('python')
             self.__rpms.append('python2')
+            self.__zypper.append('python2')
 
             if self.__devel:
                 self.__debs.append('python-dev')
                 self.__rpms.append('python2-devel')
+                self.__zypper.append('python2-devel')
 
         if self.__python3:
             self.__debs.append('python3')
             self.__rpms.append('python3')
+            self.__zypper.append('python3')
 
             if self.__devel:
                 self.__debs.append('python3-dev')
                 self.__rpms.append('python3-devel')
+                self.__zypper.append('python3-devel')
 
         # Fill in container instructions
         self.__instructions()
@@ -95,7 +100,7 @@ class python(bb_base):
         """Fill in container instructions"""
 
         self += comment('Python')
-        self += packages(apt=self.__debs, yum=self.__rpms)
+        self += packages(apt=self.__debs, yum=self.__rpms, zypper=self.__zypper)
         if self.__alternatives:
             alternatives = ['alternatives --set python /usr/bin/python2']
             if self.__devel:

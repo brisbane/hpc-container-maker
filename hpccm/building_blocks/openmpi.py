@@ -224,6 +224,12 @@ class openmpi(bb_base, hpccm.templates.ConfigureMake, hpccm.templates.envvars,
                                      'numactl-devel', 'openssh-clients',
                                      'perl', 'tar', 'wget']
             self.__runtime_ospackages = ['hwloc', 'openssh-clients']
+        elif hpccm.config.g_linux_distro == linux_distro.SUSE:
+            if not self.__ospackages:
+                self.__ospackages = ['bzip2', 'file', 'hwloc', 'make',
+                                     'numactl', 'openssh',
+                                     'perl', 'tar', 'wget']
+            self.__runtime_ospackages = ['hwloc', 'openssh-clients']
         else: # pragma: no cover
             raise RuntimeError('Unknown Linux distribution')
 
