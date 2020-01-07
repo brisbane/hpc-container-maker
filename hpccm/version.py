@@ -14,4 +14,4 @@
 
 from __future__ import absolute_import
 
-__version__ = '19.12.0'
+__version__ = '19.13.slpre'
