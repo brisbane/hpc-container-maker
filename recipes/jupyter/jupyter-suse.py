@@ -30,18 +30,18 @@ if __name__ == '__main__':
     stage = hpccm.Stage()
 
     ### Base image
-    stage += hpccm.primitives.baseimage(image=args.image, _docker_env=False, bootstrap="docker-daemon")
+    stage += hpccm.primitives.baseimage(image=args.image, _docker_env=False, bootstrap="docker")
 
     ### Install Python and Jupyter (and requirements / environment)
     if args.packager == 'pip':
         stage += hpccm.building_blocks.python(python2=False)
-        stage += hpccm.building_blocks.pip(packages=['ipython', 'jupyter'],
+        stage += hpccm.building_blocks.pip(packages=['ipython', 'jupyter', 'jupyterhub'],
                                            pip='pip3',
                                            requirements=args.requirements)
     elif args.packager == 'anaconda':
         stage += hpccm.building_blocks.conda(environment=args.environment,
                                              eula=True,
-                                             packages=['ipython', 'jupyter'])
+                                             packages=['ipython', 'jupyter', 'jupyterhub'])
 
     ### Make the port accessible (Docker only)
     stage += hpccm.primitives.raw(docker='EXPOSE 8888')

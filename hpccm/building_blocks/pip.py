@@ -94,16 +94,19 @@ class pip(bb_base, hpccm.templates.rm):
 
         self.__debs = [] # Filled in below
         self.__rpms = [] # Filled in below
+        self.__zypper = [] # Filled in below
 
         if self.__ospackages == None:
             if self.__pip.startswith('pip3'):
                 self.__debs.extend(['python3-pip', 'python3-setuptools',
                                     'python3-wheel'])
                 self.__rpms.append('python3-pip')
+                self.__zypper.append('python3-pip')
             else:
                 self.__debs.extend(['python-pip', 'python-setuptools',
                                     'python-wheel'])
                 self.__rpms.append('python2-pip')
+                self.__zypper.append('python2-pip')
                 if (hpccm.config.g_linux_distro == linux_distro.CENTOS and
                     hpccm.config.g_linux_version < StrictVersion('8.0')):
                     # python2-pip is an EPEL package in CentOS 7.x
@@ -111,6 +114,7 @@ class pip(bb_base, hpccm.templates.rm):
         elif self.__ospackages:
             self.__debs = self.__ospackages
             self.__rpms = self.__ospackages
+            self.__zypper = self.__ospackages
 
         # Fill in container instructions
         self.__instructions()
@@ -119,9 +123,9 @@ class pip(bb_base, hpccm.templates.rm):
         """Fill in container instructions"""
 
         self += comment('pip')
-        if self.__debs or self.__rpms:
+        if self.__debs or self.__rpms or self.__zypper:
             self += packages(apt=self.__debs, epel=self.__epel,
-                             yum=self.__rpms)
+                             yum=self.__rpms, zypper=self.__zypper)
 
         if self.__alternatives:
             self += shell(commands=[
