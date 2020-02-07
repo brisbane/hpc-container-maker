@@ -31,17 +31,18 @@ if __name__ == '__main__':
 
     ### Base image
     stage += hpccm.primitives.baseimage(image=args.image, _docker_env=False, bootstrap="docker")
+    stage += hpccm.building_blocks.packages(apt=['python3-dev'], yum=['python34-devel'], zypper=['python3-devel'])
 
     ### Install Python and Jupyter (and requirements / environment)
     if args.packager == 'pip':
         stage += hpccm.building_blocks.python(python2=False)
-        stage += hpccm.building_blocks.pip(packages=['ipython', 'jupyter', 'jupyterhub'],
+        stage += hpccm.building_blocks.pip(packages=['slurm','ipython', 'jupyter', 'jupyterhub', 'tqdm', 'deep-learning', 'sklearn', 'numpy<1.17', 'helper', 'tensorflow-gpu', 'matplotlib'],
                                            pip='pip3',
                                            requirements=args.requirements)
     elif args.packager == 'anaconda':
         stage += hpccm.building_blocks.conda(environment=args.environment,
                                              eula=True,
-                                             packages=['ipython', 'jupyter', 'jupyterhub'])
+                                             packages=['slurm','ipython', 'jupyter', 'jupyterhub', 'tqdm', 'deep-learning', 'sklearn', 'numpy<1.17', 'helper', 'tensorflow-gpu', 'matplotlib'])
 
     ### Make the port accessible (Docker only)
     stage += hpccm.primitives.raw(docker='EXPOSE 8888')

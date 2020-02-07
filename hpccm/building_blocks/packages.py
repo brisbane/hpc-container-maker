@@ -99,8 +99,18 @@ class packages(bb_base):
     yum_keys: A list of GPG keys to import.  The default is an empty
     list.
 
-    yum_repositories: A list of yum repositories to add.  The default
-    is an empty list.
+    yum_repositories: A list of yum repositories to add on RH based 
+    distros.  The default is an empty list.
+    
+    zypper: A list of RPM packages to install on SUSE based distros.  
+    The default value is an empty list.
+
+    zypper_keys: A list of GPG keys to import.  The default is an empty
+    list.
+    
+    zypper_repositories: A list of yum repositories to add on SUSE based 
+    distros.  The default is an empty list.
+    
 
     # Examples
 
@@ -142,6 +152,8 @@ class packages(bb_base):
         self.__yum_repositories = kwargs.get('yum_repositories', [])
 
         self.__zypper = kwargs.get('zypper', [])
+        self.__zypper_keys = kwargs.get('zypper_keys', [])
+        self.__zypper_repositories = kwargs.get('yum_zypper', [])
 
         # Fill in container instructions
         self.__instructions()
@@ -186,14 +198,9 @@ class packages(bb_base):
             
             self += zypper(download=self.__download,
                         extract=self.__extract,
-                        epel=self.__epel,
-                        keys=self.__yum_keys,
+                        keys=self.__zypper_keys,
                         ospackages=ospackages,
-                        powertools=self.__powertools,
-                        scl=self.__scl,
-                        repositories=self.__yum_repositories,
-                        yum4=self.__yum4)
-
+                        repositories=self.__zypper_repositories)
 
         else:
             raise RuntimeError('Unknown Linux distribution')
