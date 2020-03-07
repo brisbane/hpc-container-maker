@@ -36,13 +36,16 @@ if __name__ == '__main__':
     ### Install Python and Jupyter (and requirements / environment)
     if args.packager == 'pip':
         stage += hpccm.building_blocks.python(python2=False)
-        stage += hpccm.building_blocks.pip(packages=['slurm','ipython', 'jupyter', 'jupyterhub', 'tqdm', 'deep-learning', 'sklearn', 'numpy<1.17', 'helper', 'tensorflow-gpu', 'matplotlib'],
+        stage += hpccm.building_blocks.pip(packages=['ipyslurm','ipython', 'jupyter', 'jupyterhub', 'tqdm', 'deep-learning', 'sklearn', 'helper', 'tensorflow-gpu', 'matplotlib'],
                                            pip='pip3',
                                            requirements=args.requirements)
     elif args.packager == 'anaconda':
+        #4.7.12 *though latest at the time* did not work and only the 'latest' prefix did
         stage += hpccm.building_blocks.conda(environment=args.environment,
                                              eula=True,
-                                             packages=['slurm','ipython', 'jupyter', 'jupyterhub', 'tqdm', 'deep-learning', 'sklearn', 'numpy<1.17', 'helper', 'tensorflow-gpu', 'matplotlib'])
+                                             version="latest",
+                                             channels=['conda-forge', 'nvidia'],
+                                             packages=[ 'ipyslurm', 'ipython', 'jupyter', 'jupyterhub', 'tqdm', 'deep-learning', 'sklearn', 'helper', 'tensorflow-gpu', 'matplotlib'])
 
     ### Make the port accessible (Docker only)
     stage += hpccm.primitives.raw(docker='EXPOSE 8888')
@@ -51,6 +54,7 @@ if __name__ == '__main__':
     stage += hpccm.primitives.copy(src=args.notebook, dest='/notebook/',
                                    _mkdir=True)
 
+    
     ### Run Jupyter
     if args.packager == 'pip':
         stage += hpccm.primitives.runscript(
