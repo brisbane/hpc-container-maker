@@ -45,7 +45,7 @@ if __name__ == '__main__':
                                              eula=True,
                                              version="latest",
                                              channels=['conda-forge', 'nvidia'],
-                                             packages=[ 'ipyslurm', 'ipython', 'jupyter', 'jupyterhub', 'tqdm', 'deep-learning', 'sklearn', 'helper', 'tensorflow-gpu', 'matplotlib'])
+                                             packages=[ 'ipyslurm', 'ipython', 'jupyter', 'jupyterhub'])
 
     ### Make the port accessible (Docker only)
     stage += hpccm.primitives.raw(docker='EXPOSE 8888')
@@ -61,7 +61,7 @@ if __name__ == '__main__':
             commands=['jupyter notebook --no-browser --ip 0.0.0.0 --notebook-dir /notebook --allow-root'])
     elif args.packager == 'anaconda':
         stage += hpccm.primitives.shell(commands=[
-            'echo "#!/bin/bash\\nsource /usr/local/anaconda/bin/activate base\\njupyter notebook --ip 0.0.0.0 --no-browser --notebook-dir /notebook --allow-root" > /usr/local/bin/entrypoint.sh',
+            'echo -e "#!/bin/bash\\nsource /usr/local/anaconda/bin/activate base\\n\$@" > /usr/local/bin/entrypoint.sh',
             'chmod a+x /usr/local/bin/entrypoint.sh'])
         stage += hpccm.primitives.runscript(
             commands=['/usr/local/bin/entrypoint.sh'])
